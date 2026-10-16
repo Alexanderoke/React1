@@ -4,3 +4,5 @@
 .card img { width: 100%; border-radius: 6px; }
 .form { display: flex; flex-direction: column; gap: 10px; }
 .form input { padding: 8px;}
+.card input { width: 100%; box-sizing: border-box; margin-bottom: 6px; padding: 6px;}
+.card button { margin-right: 6px;margin-top: 6px;}
