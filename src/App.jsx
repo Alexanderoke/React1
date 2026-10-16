@@ -32,6 +32,16 @@ function App() {
   setProducts(products.filter((p) => p.id !== id));
 }
 
+async function updateProduct(id, updated) {
+  const res = await fetch(`${API}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updated),
+  });
+  const saved = await res.json();
+  setProducts(products.map((p) => (p.id === id ? saved : p)));
+}
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -40,7 +50,7 @@ function App() {
       <ProductForm onAdd={addProduct} />
       <div className="grid">
         {products.map((p) => (
-          <ProductCard key={p.id} product={p} onDelete={deleteProduct} />
+          <ProductCard key={p.id} product={p} onDelete={deleteProduct} onUpdate={updateProduct} />
         ))}
       </div>
     </div>
