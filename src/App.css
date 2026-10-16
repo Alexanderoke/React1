@@ -3,4 +3,4 @@
 .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; text-align: left; }
 .card img { width: 100%; border-radius: 6px; }
 .form { display: flex; flex-direction: column; gap: 10px; }
-.form input, .form textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+.form input { padding: 8px;}
