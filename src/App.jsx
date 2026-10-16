@@ -27,6 +27,10 @@ function App() {
     const created = await res.json();
     setProducts([...products, created]);
   }
+  async function deleteProduct(id) {
+  await fetch(`${API}/${id}`, { method: "DELETE" });
+  setProducts(products.filter((p) => p.id !== id));
+}
 
   if (loading) return <p>Loading...</p>;
 
@@ -36,7 +40,7 @@ function App() {
       <ProductForm onAdd={addProduct} />
       <div className="grid">
         {products.map((p) => (
-          <ProductCard key={p.id} product={p} />
+          <ProductCard key={p.id} product={p} onDelete={deleteProduct} />
         ))}
       </div>
     </div>
