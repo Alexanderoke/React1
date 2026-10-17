@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const FALLBACK = "https://picsum.photos/seed/placeholder/300/200";
 
@@ -43,7 +44,7 @@ function ProductCard({ product, onDelete, onUpdate }) {
           e.target.src = FALLBACK;
         }}
       />
-      <h3>{product.name}</h3>
+      <h3><Link to={`/products/${product.id}`}>{product.name}</Link></h3>
       <p>{product.description}</p>
       <strong>${product.price.toFixed(2)}</strong>
       <button onClick={() => setIsEditing(true)}>Edit</button>

@@ -6,3 +6,6 @@
 .form input { padding: 8px;}
 .card input { width: 100%; box-sizing: border-box; margin-bottom: 6px; padding: 6px;}
 .card button { margin-right: 6px;margin-top: 6px;}
+.app a { color: inherit;}
+.detail { max-width: 500px; margin: 0 auto; text-align: left;}
+.detail img { width: 100%; border-radius:8px; margin: 12px 0;}
