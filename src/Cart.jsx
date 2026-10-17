@@ -28,6 +28,7 @@ function Cart(){
         </div>
       ))}
       <h3>Total: ${total.toFixed(2)}</h3>
+      <Link to="/checkout"><button>Proceed to checkout</button></Link>
     </div>
   );
 }

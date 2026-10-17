@@ -4,6 +4,7 @@ import ProductDetail from "./ProductDetail";
 import Cart from "./Cart";
 import { userCart } from "./CartContext";
 import "./App.css";
+import Checkout from "./Checkout";
 
 function App() {
   const {count} = userCart();
@@ -18,6 +19,7 @@ function App() {
          <Route path="/" element={<Home />} />
          <Route path="/products/:id" element={<ProductDetail />} />
          <Route path="/cart" element={<Cart/>}/>
+         <Route path="/checkout" element={<Checkout/>}/>
        </Routes>
      </div>
    );

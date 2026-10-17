@@ -56,4 +56,61 @@ app.delete("/api/products/:id", (req, res) => {
   res.status(204).end();
 });
 
+db.exec(`
+ 
+
+  CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    total REAL NOT NULL,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP  
+  );
+
+  CREATE TABLE IF NOT EXISTS order_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL REFERENCES orders(id),
+    product_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    price REAL NOT NULL,
+    qty INTEGER NOT NULL  
+  );
+  `);
+
+  app.post("/api/orders", (req, res) =>{
+    const {customer_name, email, items} = req.body;
+    if (!customer_name || !email || !Array.isArray(items) || items.length===0) {
+      return res.status (400).json({error: "name, email and item required"});      
+    }
+
+    //look prices up in the database; never trust price sent by the browser
+    const getProduct = db.prepare("SELECT * FROM products WHERE id = ?");
+    const lines =[];
+    for (const item of items) {
+      const product =getProduct.get(item.product_id);
+      const qty = Number (item.qty);
+      if (!product || ! Number.isInteger(qty) || qty < 1) {
+        return res.status(400).json({error: "Invalid item"});        
+      }
+      lines.push({product, qty});    
+    }
+
+    const total = Math.round(lines.reduce((s, l) => s + l.product.price * l.qty, 0)* 100) / 100;
+
+    const placeOrder =db.transaction(()=>{
+      const order = db
+      .prepare("INSERT INTO orders (customer_name, email, total) VALUES (?, ?, ?)")
+      .run(customer_name, email, total);
+      const insertItem = db.prepare(
+        "INSERT INTO order_items (order_id, product_id, name, price, qty) VALUES(?,?,?,?,?)"
+      );
+      for (const l of lines) {
+        insertItem.run(order.lastInsertRowid, l.product.id, l.product.name, l.product.price, l.qty);        
+      }
+      return order.lastInsertRowid;
+    });
+    const orderId = placeOrder();
+    res.status(201).json({ id: Number (orderId), total });
+  });
+
 app.listen(3001, () => console.log("API running on http://localhost:3001"));
