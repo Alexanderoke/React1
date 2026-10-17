@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { userCart } from "./CartContext";
+
 
 const FALLBACK = "https://picsum.photos/seed/placeholder/600/400";
 
@@ -7,6 +9,7 @@ function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState("loading");
+  const { addToCart} = userCart();
 
   useEffect(() => {
     fetch(`http://localhost:3001/api/products/${id}`)
@@ -43,6 +46,7 @@ function ProductDetail() {
       <h2>{product.name}</h2>
       <p>{product.description}</p>
       <strong>${product.price.toFixed(2)}</strong>
+      <button onClick={() => addToCart(product)}>Add to cart</button>
     </div>
   );
 }

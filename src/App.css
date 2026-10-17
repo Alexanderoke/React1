@@ -9,3 +9,6 @@
 .app a { color: inherit;}
 .detail { max-width: 500px; margin: 0 auto; text-align: left;}
 .detail img { width: 100%; border-radius:8px; margin: 12px 0;}
+.header { display: flex; justify-content: space-between; align-items: center;}
+.cart {max-width: 600px;margin: 0 auto; text-align: left;}
+.cart-row {display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #ccc; }

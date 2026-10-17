@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { userCart } from "./CartContext";
 
 const FALLBACK = "https://picsum.photos/seed/placeholder/300/200";
 
@@ -15,6 +16,7 @@ function ProductCard({ product, onDelete, onUpdate }) {
     await onUpdate(product.id, { ...form, price: Number(form.price) });
     setIsEditing(false);
   }
+  const { addToCart } = userCart();
 
   function handleCancel() {
     setForm(product);
@@ -49,6 +51,7 @@ function ProductCard({ product, onDelete, onUpdate }) {
       <strong>${product.price.toFixed(2)}</strong>
       <button onClick={() => setIsEditing(true)}>Edit</button>
       <button onClick={() => onDelete(product.id)}>Delete</button>
+      <button onClick={() => addToCart(product)}>Add to cart</button>
     </div>
   );
 }
