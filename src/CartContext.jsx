@@ -54,6 +54,6 @@ return (
   </CartContext.Provider>
 );
 }
-export function userCart(){
+export function useCart(){
   return useContext(CartContext);
 }

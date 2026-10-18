@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { userCart } from "./CartContext";
+import { useCart } from "./CartContext";
 
 const FALLBACK = "https://picsum.photos/seed/placeholder/300/200";
 
-function ProductCard({ product, onDelete, onUpdate }) {
+function ProductCard({ product, admin = false, onDelete, onUpdate }) {
+  const { addToCart } = useCart();
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState(product);
 
@@ -16,7 +17,6 @@ function ProductCard({ product, onDelete, onUpdate }) {
     await onUpdate(product.id, { ...form, price: Number(form.price) });
     setIsEditing(false);
   }
-  const { addToCart } = userCart();
 
   function handleCancel() {
     setForm(product);
@@ -49,9 +49,16 @@ function ProductCard({ product, onDelete, onUpdate }) {
       <h3><Link to={`/products/${product.id}`}>{product.name}</Link></h3>
       <p>{product.description}</p>
       <strong>${product.price.toFixed(2)}</strong>
-      <button onClick={() => setIsEditing(true)}>Edit</button>
-      <button onClick={() => onDelete(product.id)}>Delete</button>
-      <button onClick={() => addToCart(product)}>Add to cart</button>
+      <div>
+        {admin ? (
+          <>
+            <button onClick={() => setIsEditing(true)}>Edit</button>
+            <button onClick={() => onDelete(product.id)}>Delete</button>
+          </>
+        ) : (
+          <button onClick={() => addToCart(product)}>Add to cart</button>
+        )}
+      </div>
     </div>
   );
 }

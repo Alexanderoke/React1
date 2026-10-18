@@ -1,11 +1,11 @@
 
 import {useState} from "react";
 import { Link } from "react-router-dom";
-import { userCart } from "./CartContext";
+import { useCart } from "./CartContext";
 const ORDERS_API = "http://localhost:3001/api/orders";
 
 function Checkout() {
-  const { items, total, clearCart } = userCart();
+  const { items, total, clearCart } = useCart();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);

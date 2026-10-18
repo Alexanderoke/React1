@@ -12,3 +12,10 @@
 .header { display: flex; justify-content: space-between; align-items: center;}
 .cart {max-width: 600px;margin: 0 auto; text-align: left;}
 .cart-row {display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #ccc; }
+.top-nav { display: flex; gap: 16px;}
+.admin-nav { display: flex; gap: 16px; margin-bottom: 20px;}
+.admin-nav a.active { font-weight: bold; text-decoration: underline;}
+.orders { width: 100%; border-collapse: collapse; text-align: left;}
+.orders th, .orders td { padding: 8px; border-bottom: 1px solid #ccc;}
+.order-row {cursor: pointer;}
+.order-row:hover { background: rgba(128,128 green,128 blue,0.15 alpha);}

@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { userCart } from "./CartContext";
+import { useCart } from "./CartContext";
 
 function Cart(){
-  const { items, changeQty, removeFromCart, total} =userCart();
+  const { items, changeQty, removeFromCart, total} =useCart();
   if (items.length === 0){
     return (
       <div>

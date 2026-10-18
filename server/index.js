@@ -113,4 +113,23 @@ db.exec(`
     res.status(201).json({ id: Number (orderId), total });
   });
 
+  app.get("/api/orders", (req,res) => {
+    const orders= db.prepare(
+      `SELECT o.*, COALESCE(SUM(oi.qty), 0) AS item_count
+      FROM orders o
+      LEFT JOIN order_items oi ON oi.order_id = o.id
+      GROUP BY o.id
+      ORDER BY o.id DESC`
+    )
+    .all();
+    res.json(orders);
+  });
+
+  app.get("/api/orders/:id", (req, res) => {
+    const orders = db.prepare("SELECT * FROM orders WHERE id = ?").get(req.params.id);
+    if (!orders) return res.status(404).json({ error: "Not found"});
+    const items = db.prepare("SELECT * FROM order_items WHERE order_id = ?").all(req.params.id);
+    res.json({ ...order, items});
+  });
+
 app.listen(3001, () => console.log("API running on http://localhost:3001"));
