@@ -2,7 +2,9 @@
 import {useState} from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "./CartContext";
-const ORDERS_API = "http://localhost:3001/api/orders";
+import { API_URL} from "./config";
+
+const ORDERS_API = "${ API_URL}/api/orders";
 
 function Checkout() {
   const { items, total, clearCart } = useCart();

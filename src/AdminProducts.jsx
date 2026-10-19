@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 import ProductForm from "./ProductForm";
 import { useAuth } from "./AuthContext";
+import { API_URL } from "./config";
 
-const API = "http://localhost:3001/api/products";
+const API = "${ API_URL}/api/products";
 
 function AdminProducts() {
   const { authFetch } = useAuth();

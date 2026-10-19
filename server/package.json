@@ -6,6 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  
+  "start": "node index.js",
   "keywords": [],
   "type": "commonjs",
   "dependencies": {
@@ -14,5 +16,6 @@
     "cors": "^2.8.6",
     "express": "^5.3.0",
     "jsonwebtoken": "^9.0.3"
+    
   }
 }

@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "./ProductCard";
+import { API_URL } from "./config";
 
-const API = "http://localhost:3001/api/products";
+const API = "${ API_URL}/api/products";
 
 function Home() {
   const [products, setProducts] = useState([]);

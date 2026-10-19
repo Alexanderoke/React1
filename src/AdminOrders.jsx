@@ -1,7 +1,8 @@
 import { Fragment, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { API_URL } from "./config";
 
-const API = "http://localhost:3001/api/orders";
+const API = "${ API_URL}/api/orders";
 
 function formatDate(sqlDate) {
   return new Date(sqlDate.replace(" ", "T") + "Z").toLocaleString();

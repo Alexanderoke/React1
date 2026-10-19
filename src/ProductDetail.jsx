@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useCart } from "./CartContext";
+import { API_URL } from "./config";
 
 
 const FALLBACK = "https://picsum.photos/seed/placeholder/600/400";
@@ -12,7 +13,7 @@ function ProductDetail() {
   const { addToCart} = useCart();
 
   useEffect(() => {
-    fetch(`http://localhost:3001/api/products/${id}`)
+    fetch(`${API_URL}/api/products/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Not found");
         return res.json();

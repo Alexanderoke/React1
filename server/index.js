@@ -217,4 +217,17 @@ db.exec(`
     res.status(500).json({ error: err.message});
   });
 
-app.listen(3001, () => console.log("API running on http://localhost:3001"));
+  app.use(cors({origin: process.env.FRONTEND_URL || true}));
+
+  if (db.prepare("SELECT COUNT(*) AS c FROM products").get().c ===0) {
+    const ins = db.prepare("INSERT INTO products (name, price, description, image)VALUES(?,?,?,?)");
+    ins.run("sample Shirt", 20, "A simple shirt", "");
+    ins.run("sample Mug", 8, "A simple mug","");
+  }
+  if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+    db.prepare(`INSERT INTO users(name, email, password_hash, role)VALUES ('Admin', ?, ?, 'admin')
+      ON CONFLICT(email)DO UPDATE SET password_hash = excluded.password_hash, role= 'admin'`)
+      .run(process.env.ADMIN_EMAIL.toLocaleLowerCase(), bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10));
+  }
+
+app.listen(process.env.PORT || 3001, () => console.log("API running"));
