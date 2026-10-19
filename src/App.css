@@ -19,3 +19,6 @@
 .orders th, .orders td { padding: 8px; border-bottom: 1px solid #ccc;}
 .order-row {cursor: pointer;}
 .order-row:hover { background: rgba(128,128 green,128 blue,0.15 alpha);}
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;}
+.filters input, .filters select{padding: 8px;}
+.filters input[type="search"]{flex: 1; min-width: 180px;}
