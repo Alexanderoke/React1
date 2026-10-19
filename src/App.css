@@ -12,7 +12,7 @@
 .header { display: flex; justify-content: space-between; align-items: center;}
 .cart {max-width: 600px;margin: 0 auto; text-align: left;}
 .cart-row {display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #ccc; }
-.top-nav { display: flex; gap: 16px;}
+.top-nav { display: flex; gap: 16px; align-items: center;}
 .admin-nav { display: flex; gap: 16px; margin-bottom: 20px;}
 .admin-nav a.active { font-weight: bold; text-decoration: underline;}
 .orders { width: 100%; border-collapse: collapse; text-align: left;}

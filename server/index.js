@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const Database = require("better-sqlite3");
+const bcrypt = require ("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 app.use(cors());
@@ -17,6 +19,80 @@ db.exec(`
   )
 `);
 
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'customer'
+    )
+  `);
+  function signToken(user) {
+    return jwt.sign({id: user.id, role:user.role}, JWT_SECRET, {expiresIn: "7d"});    
+  }
+
+  function publicUser(u){
+    return{id: u.id, name: u.name, email: u.email, role: u.role};
+  }
+
+  function requireAuth(req, res, next) {
+    const header = req.headers.authorization || "";
+    const token = header.startsWith("Bearer") ? header.slice(7) : null;
+    if (!token) return res.status(401).json({ error: "Login required"});
+    try{
+      req.user = jwt.verify(token, JWT_SECRET);
+      next();
+    }catch {
+      res.status(401).json({ error: "Session expired, please login again" });
+    }
+  }
+
+  function requireAdmin(req, res, next) {
+    requireAuth(req, res, () => {
+      if (req.user.role !== "admin") {
+        return res.status(403).json({error: "Admins only"});
+      }
+      next();
+    });    
+  }
+
+  app.post("/api/auth/register", (req, res) => {
+    const name = String(req.body.name || "").trim();
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const password = String(req.body.password || "");
+    if (!name || !email || password.length <8) {
+      return res.status(400).json({error: "Name, email and a password of 8+ characters required"});      
+    }
+    if (db.prepare("SELECT id FROM users WHERE email = ?").get(email)) {
+      return res.status(409).json({error: "Email already registered"});      
+    }
+    const hash = bcrypt.hashSync(password, 10);
+    const result = db
+      .prepare("INSERT INTO users (name, email, password_hash) VALUES(?,?,?)")
+      .run(name, email, hash);
+    const user = db.prepare("SELECT * FROM users WHERE id= ?").get(result.lastInsertRowid);
+    res.status(201).json({ token: signToken(user), user: publicUser(user)});
+  });
+
+  app.post("/api/auth/login", (req, res) => {
+    const email =String(req.body.email || "").trim().toLocaleLowerCase();
+    const password = String(req.body.email || "");
+    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+    if (!user || !bcrypt.compareSync(password, user.password_hash)){
+      return res.status(401).json({error: "Wrong email or password"});
+    }
+    res.json({ token: signToken(user), user: publicUser(user)});
+  });
+
+  app.get("/api/auth/me", requireAuth, (req, res) => {
+    const user =db.prepare("SELECT * FROM users WHERE id = ?").get(req.user.id);
+    if(!user) return res.status(401).json({error: "Account not found"});
+    res.json(publicUser(user));
+  });
+
 // READ all
 app.get("/api/products", (req, res) => {
   res.json(db.prepare("SELECT * FROM products").all());
@@ -30,7 +106,7 @@ app.get("/api/products/:id", (req, res) => {
 });
 
 // CREATE
-app.post("/api/products", (req, res) => {
+app.post("/api/products", requireAdmin, (req, res) => {
   const { name, price, description = "", image = "" } = req.body;
   if (!name || price == null) return res.status(400).json({ error: "name and price required" });
   const result = db
@@ -40,7 +116,7 @@ app.post("/api/products", (req, res) => {
 });
 
 // UPDATE
-app.put("/api/products/:id", (req, res) => {
+app.put("/api/products/:id",requireAdmin, (req, res) => {
   const { name, price, description, image } = req.body;
   const result = db
     .prepare("UPDATE products SET name = ?, price = ?, description = ?, image = ? WHERE id = ?")
@@ -50,7 +126,7 @@ app.put("/api/products/:id", (req, res) => {
 });
 
 // DELETE
-app.delete("/api/products/:id", (req, res) => {
+app.delete("/api/products/:id", requireAdmin, (req, res) => {
   const result = db.prepare("DELETE FROM products WHERE id = ?").run(req.params.id);
   if (result.changes === 0) return res.status(404).json({ error: "Not found" });
   res.status(204).end();
@@ -113,7 +189,7 @@ db.exec(`
     res.status(201).json({ id: Number (orderId), total });
   });
 
-  app.get("/api/orders", (req,res) => {
+  app.get("/api/orders", requireAdmin, (req,res) => {
     const orders= db.prepare(
       `SELECT o.*, COALESCE(SUM(oi.qty), 0) AS item_count
       FROM orders o
@@ -125,7 +201,7 @@ db.exec(`
     res.json(orders);
   });
 
-  app.get("/api/orders/:id", (req, res) => {
+  app.get("/api/orders/:id", requireAdmin, (req, res) => {
     const orders = db.prepare("SELECT * FROM orders WHERE id = ?").get(req.params.id);
     if (!orders) return res.status(404).json({ error: "Not found"});
     const items = db.prepare("SELECT * FROM order_items WHERE order_id = ?").all(req.params.id);

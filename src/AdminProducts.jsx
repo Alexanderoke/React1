@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 import ProductForm from "./ProductForm";
+import { useAuth } from "./AuthContext";
 
 const API = "http://localhost:3001/api/products";
 
 function AdminProducts() {
+  const { authFetch } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,26 +20,38 @@ function AdminProducts() {
   }, []);
 
   async function addProduct(newProduct) {
-    const res = await fetch(API, {
+    const res = await authFetch(API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newProduct),
     });
+    if (!res.ok) {
+      alert("Could not add the product. Are you still logged in?");
+      return;
+    }
     const created = await res.json();
     setProducts([...products, created]);
   }
 
   async function deleteProduct(id) {
-    await fetch(`${API}/${id}`, { method: "DELETE" });
+    const res = await authFetch(`${API}/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      alert("Could not delete the product. Are you still logged in?");
+      return;
+    }
     setProducts(products.filter((p) => p.id !== id));
   }
 
   async function updateProduct(id, updated) {
-    const res = await fetch(`${API}/${id}`, {
+    const res = await authFetch(`${API}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updated),
     });
+    if (!res.ok) {
+      alert("Could not save the product. Are you still logged in?");
+      return;
+    }
     const saved = await res.json();
     setProducts(products.map((p) => (p.id === id ? saved : p)));
   }

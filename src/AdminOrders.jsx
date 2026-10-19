@@ -1,4 +1,5 @@
 import { Fragment, useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 
 const API = "http://localhost:3001/api/orders";
 
@@ -7,32 +8,34 @@ function formatDate(sqlDate) {
 }
 
 function AdminOrders() {
+  const {authFetch} = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState(null);
   const [details, setDetails] = useState({});
 
   useEffect(() => {
-    fetch(API)
-      .then((res) => res.json())
-      .then((data) => {
-        setOrders(data);
-        setLoading(false);
-      });
-  }, []);
+  authFetch(API)
+    .then((res) => (res.ok ? res.json() : []))
+    .then((data) => {
+      setOrders(data);
+      setLoading(false);
+    });
+}, []);
 
-  async function toggle(id) {
-    if (openId === id) {
-      setOpenId(null);
-      return;
-    }
-    setOpenId(id);
-    if (!details[id]) {
-      const res = await fetch(`${API}/${id}`);
-      const data = await res.json();
-      setDetails((current) => ({ ...current, [id]: data }));
-    }
+async function toggle(id) {
+  if (openId === id) {
+    setOpenId(null);
+    return;
   }
+  setOpenId(id);
+  if (!details[id]) {
+    const res = await authFetch(`${API}/${id}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    setDetails((current) => ({ ...current, [id]: data }));
+  }
+}
 
   const revenue = orders.reduce((sum, o) => sum + o.total, 0);
 
