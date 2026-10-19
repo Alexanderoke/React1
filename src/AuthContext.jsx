@@ -21,7 +21,7 @@ export function AuthProvider({children}){
       setChecking(false);
       return;      
     }
-    fetch(`${API}/auth/me`, {headers: {Authorisation: `Bearer ${token}`}})
+    fetch(`${API}/auth/me`, {headers: {Authorization: `Bearer ${token}`}})
     .then((res) => (res.ok ? res.json(): Promise.reject()))
     .then((data) => setUser(data))
     .catch(() => {

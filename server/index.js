@@ -78,14 +78,18 @@ db.exec(`
   });
 
   app.post("/api/auth/login", (req, res) => {
-    const email =String(req.body.email || "").trim().toLocaleLowerCase();
-    const password = String(req.body.email || "");
-    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
-    if (!user || !bcrypt.compareSync(password, user.password_hash)){
-      return res.status(401).json({error: "Wrong email or password"});
-    }
-    res.json({ token: signToken(user), user: publicUser(user)});
-  });
+  const email = String(req.body.email || "").trim().toLowerCase();
+  const password = String(req.body.password || "");
+  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  console.log("LOGIN attempt:", JSON.stringify(email), "| user found:", Boolean(user), "| password length:", password.length);
+  console.log("DB file in use:", require("path").resolve("shop.db"));
+  const ok = user ? bcrypt.compareSync(password, user.password_hash) : false;
+  console.log("password matches:", ok);
+  if (!ok) {
+    return res.status(401).json({ error: "Wrong email or password" });
+  }
+  res.json({ token: signToken(user), user: publicUser(user) });
+});
 
   app.get("/api/auth/me", requireAuth, (req, res) => {
     const user =db.prepare("SELECT * FROM users WHERE id = ?").get(req.user.id);
@@ -206,6 +210,11 @@ db.exec(`
     if (!orders) return res.status(404).json({ error: "Not found"});
     const items = db.prepare("SELECT * FROM order_items WHERE order_id = ?").all(req.params.id);
     res.json({ ...order, items});
+  });
+
+  app.use((err, req, res, next) => {
+    console.error("server error:", err.message);
+    res.status(500).json({ error: err.message});
   });
 
 app.listen(3001, () => console.log("API running on http://localhost:3001"));
